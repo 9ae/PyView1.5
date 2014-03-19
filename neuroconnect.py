@@ -117,8 +117,13 @@ class PlayToneThread (Thread):
                 taskO_Neuralynx.write(1)
                 taskO_Neuralynx.write(0)
                 
-                time.sleep(self.rd) 
-                
+                playTime = datetime.now()
+                deltaTime = playTime
+                print 'start @ %s'%(playTime)
+                while (deltaTime-playTime)<timedelta(seconds=self.rd) and not(self.stop_flag):
+                	time.sleep(0.001)
+                	deltaTime = datetime.now()
+                print 'stop @ %s'%(deltaTime)
                 taskPlay.write([0,0,0,0,0,0,0,0],layout='group_by_channel')
                 taskPlay.stop()
                 taskPlay.clear()
@@ -132,7 +137,6 @@ class PlayToneThread (Thread):
 
         else:
             time.sleep(self.rd)
-        self.stop()
 
     def stop(self):
         self.stop_flag = True

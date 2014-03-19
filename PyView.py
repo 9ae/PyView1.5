@@ -37,6 +37,7 @@ timer = {'total':0.0, 'durStart':0.0, 'durLapse':0.0, 'toneAt':0.0, 't0':0.0, 's
 item = {'jukebox':None}
 Frame = None
 filename = ''
+toneThread = None
         
 class MainThread(Thread):
     """ Main thread running while experiment is running
@@ -471,7 +472,12 @@ class MainFrame(wx.Frame):
 
 def startNewTrial(startAt=0):
     """ New trial function"""
-    global derby
+    global derby, toneThread
+
+    if toneThread!=None:
+        if toneThread.is_alive():
+            toneThread.stop()
+
     inum = 0
     for i in X.intervalList:
         #if i.changable:
@@ -588,7 +594,7 @@ def bindExp():
         #X.intervalList[self.interval].duration
     
     def act_play(self):
-        global timeStamps
+        global timeStamps, toneThread
         #send tone
         i = freq2int(self.freq)
         a = int2bi8(i)
@@ -596,7 +602,7 @@ def bindExp():
             di = uv.ToneFreq.index(self.freq)
         except IndexError:
             di = 0
-        neu.PlayToneThread(X.intervalList[derby].duration,a,di)
+        toneThread = neu.PlayToneThread(X.intervalList[derby].duration,a,di)
         #log text
         timer['toneAt'] = time.clock() - timer['t0']
         flag['tonePlayed'] = True
