@@ -151,10 +151,10 @@ class MainThread(Thread):
             
             #detect lever presses
             self.leverPressed = False
-            #self.leverPressed = neu.main_lvpress()
+            self.leverPressed = neu.main_lvpress()
             if flag['pseudoPress']:
-                #self.leverPressed = True
-                self.leverPressed = neu.fake_lvpress(True)
+                self.leverPressed = True
+                #self.leverPressed = neu.fake_lvpress(True)
                 flag['pseudoPress'] = False
             if flag['ignoreLever']:
                 self.leverPressed = False

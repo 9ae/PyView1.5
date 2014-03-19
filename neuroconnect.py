@@ -29,7 +29,7 @@ flag = {'tone':True,'taste':True,'pulse':False}
 """ ready flags do not run event if we know channel was still busy"""
 
 # time during which to not register additional lever presses in microseconds
-leverStandoffTime = 500000
+leverStandoffTime = 20000
 leverLastPressed = None
 
 class NullEventThread (Thread):
@@ -231,29 +231,32 @@ def fake_lvpress(pressed):
 	global leverLastPressed, leverStandoffTime
 	if leverLastPressed!=None:
 		diff = datetime.now() - leverLastPressed
-		if diff > timedelta(microseconds=leverStandoffTime):
-			leverLastPressed = datetime.now()
-			return pressed
-		else:
+		if diff < timedelta(microseconds=leverStandoffTime):
 			print 'IGNORE PRESS'
 			return False
-	else:
-		if pressed:
-			leverLastPressed = datetime.now()
-		return pressed
+	if pressed:
+		leverLastPressed = datetime.now()
+	return pressed
 		
 	
 def main_lvpress():
     """ Detect lever press"""
-    global taskI, taskO
+    global taskI, taskO, leverLastPressed, leverStandoffTime
     if not(DEVICE_ON):
         return False
+       
+    if leverLastPressed!=None:
+       diff = datetime.now() - leverLastPressed
+       if diff < timedelta(microseconds=leverStandoffTime):
+           return False
     try:
         (data,abc) = taskI.read(samples_per_channel = 1, timeout = -1, fill_mode = 'group_by_channel')
         leverPressed = (data[0][0] == 1)
         if leverPressed:
             taskO.write(1)
             taskO.write(0)
+            if leverLastPressed!=None:
+                leverLastPressed = datetime.now()
     except RuntimeError:
         return False
     return leverPressed
