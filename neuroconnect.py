@@ -1,4 +1,4 @@
-DEVICE_ON = False
+DEVICE_ON = True
 
 if DEVICE_ON:
     from libnidaqmx import System
@@ -29,8 +29,8 @@ flag = {'tone':True,'taste':True,'pulse':False}
 """ ready flags do not run event if we know channel was still busy"""
 
 # time during which to not register additional lever presses in microseconds
-leverStandoffTime = 20000
-leverLastPressed = None
+leverStandoffTime = timedelta(microseconds=50000)  # time between valid lever presses
+lastLeverPress = {'time':None, 'result': False}
 
 class NullEventThread (Thread):
     """ Mark time thread"""
@@ -245,25 +245,32 @@ def fake_lvpress(pressed):
 	
 def main_lvpress():
     """ Detect lever press"""
-    global taskI, taskO, leverLastPressed, leverStandoffTime
+    global taskI, taskO, lastLeverPress, leverStandoffTime
     if not(DEVICE_ON):
         return False
        
-    if leverLastPressed!=None:
-       diff = datetime.now() - leverLastPressed
-       if diff < timedelta(microseconds=leverStandoffTime):
+    if lastLeverPress['time']!=None:
+       diff = datetime.now() - lastLeverPress['time']
+       if diff < leverStandoffTime:
            return False
     try:
         (data,abc) = taskI.read(samples_per_channel = 1, timeout = -1, fill_mode = 'group_by_channel')
         leverPressed = (data[0][0] == 1)
         if leverPressed:
-            taskO.write(1)
-            taskO.write(0)
-            if leverLastPressed!=None:
-                leverLastPressed = datetime.now()
+            if not(lastLeverPress['result']):
+                taskO.write(1)
+                taskO.write(0)
+            else:
+                leverPressed = False
+            lastLeverPress['time'] = datetime.now()
+            lastLeverPress['result'] = True
+        else:
+            if lastLeverPress['result']:
+                lastLeverPress['time'] = datetime.now()
+            lastLeverPress['result'] = False
+        return leverPressed
     except RuntimeError:
         return False
-    return leverPressed
 
 def main_pulse():
     """  Returns 1: start pulse, 0: no pulse, -1: end pulse"""

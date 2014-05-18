@@ -72,6 +72,7 @@ class MainThread(Thread):
 
     def updateTimes(self):
         """ Updates time at end of the loop"""
+        global timer
         T = time.clock()
         timer['total'] = T - timer['t0']
         timer['durLapse'] = T - timer['durStart']
@@ -577,7 +578,7 @@ def bindExp():
             timer['durLapse'] = 0.0
             derby = jumpTo
             X.swiss.redraw_flag = True
-        flag['freezeDerby'] =True
+            flag['freezeDerby'] =True
     
     def act_cid(self):
         newdur = X.intervalList[self.interval].duration

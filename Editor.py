@@ -938,6 +938,12 @@ class DialogTone(IntervalForm):
             self.act.icon.AddText("%d Hz" % uv.ToneFreq[self.toneField.GetSelection()])
             IntervalForm.linkacts(self, evt)
         self.act.maxDuration = md
+        if self.varyCheck.IsChecked():
+            self.act.vary = True
+            self.act.varyBy = float(self.varyField.GetValue())
+        else:
+            self.act.vary = False
+            self.act.varyBy = 0.0
         E.panel.adjustTd()
         self.Close()
 
@@ -980,6 +986,12 @@ class DialogRewardInt(IntervalForm):
             self.act.duration = dur
             IntervalForm.linkacts(self, evt)
         self.act.maxDuration = md
+        if self.varyCheck.IsChecked():
+            self.act.vary = True
+            self.act.varyBy = float(self.varyField.GetValue())
+        else:
+            self.act.vary = False
+            self.act.varyBy = 0.0
         E.panel.adjustTd()
         self.Close()
         
@@ -1023,6 +1035,12 @@ class DialogNogo(IntervalForm):
             X.intervalList[self.Id].duration = dur
             IntervalForm.linkacts(self, evt)
         self.act.maxDuration = md
+        if self.varyCheck.IsChecked():
+            self.act.vary = True
+            self.act.varyBy = float(self.varyField.GetValue())
+        else:
+            self.act.vary = False
+            self.act.varyBy = 0.0
         E.panel.adjustTd()
         self.Close()
         
