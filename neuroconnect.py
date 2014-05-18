@@ -1,4 +1,4 @@
-DEVICE_ON = True
+DEVICE_ON = False
 
 if DEVICE_ON:
     from libnidaqmx import System

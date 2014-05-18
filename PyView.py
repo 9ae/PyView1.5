@@ -111,6 +111,12 @@ class MainThread(Thread):
             timer['durStart'] = time.clock()
             timer['durLapse'] = 0.0
             self.doBeginAction()
+        else:
+        	if flag['freezeDerby']:
+        		starti = "\n%s >>> %s (%s Interval) ENTERED \n"%(timer['total'], X.intervalList[derby].name,X.intervalList[derby].type)
+        		log(starti)
+        		flag['freezeDerby'] = False
+        	
             
     def doEndAction(self):
         """ perform End action"""
@@ -577,8 +583,8 @@ def bindExp():
             timer['durStart'] = time.clock()
             timer['durLapse'] = 0.0
             derby = jumpTo
-            X.swiss.redraw_flag = True
-            flag['freezeDerby'] =True
+        X.swiss.redraw_flag = True
+        flag['freezeDerby'] = True
     
     def act_cid(self):
         newdur = X.intervalList[self.interval].duration
